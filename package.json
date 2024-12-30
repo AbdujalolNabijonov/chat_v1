@@ -1,0 +1,26 @@
+{
+  "name": "community-chat-socketio",
+  "version": "1.0.0",
+  "description": "This is Community chatting web App for real time chatting",
+  "main": "./src/server.ts",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node ./src/server.ts",
+    "dev": ""
+  },
+  "author": "Abdujalol",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1",
+    "ts-node": "^10.9.2",
+    "tsconfig": "^7.0.0",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/socket.io": "^3.0.1"
+  }
+}
