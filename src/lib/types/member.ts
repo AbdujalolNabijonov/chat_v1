@@ -15,6 +15,7 @@ export interface MemberSignupInput {
     memberPassword: string
 }
 
-export interface MemberLoginInput{
-
+export interface MemberLoginInput {
+    memberNick: string;
+    memberPassword: string;
 }

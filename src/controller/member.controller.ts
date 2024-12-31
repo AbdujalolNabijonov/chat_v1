@@ -5,6 +5,7 @@ import { Errors } from "../lib/ErrorHander";
 import AuthService from "../model/Auth.service";
 import { MemberLoginInput, MemberSignupInput } from "src/lib/types/member";
 import { TOKEN_DURATION } from "../lib/config";
+import { HttpCode } from "../lib/enums/Error";
 
 const memberService = new MemberService()
 const authService = new AuthService();
@@ -20,7 +21,6 @@ memberController.signup = async (req: Request, res: Response) => {
         const payload: T = { ...result };
         delete payload._id;
         const token = await authService.createToken(payload);
-        console.log("token", token)
         res.cookie(
             "accessToken",
             token,
@@ -30,7 +30,7 @@ memberController.signup = async (req: Request, res: Response) => {
             }
         )
 
-        res.status(201).json({ member: result })
+        res.status(HttpCode.CREATED).json(result)
     } catch (err: any) {
         console.log(`ERROR: createMember: ${err.message}`);
         if (err instanceof Errors) res.status(err.code).json(err)
@@ -38,16 +38,28 @@ memberController.signup = async (req: Request, res: Response) => {
     }
 }
 
-memberController.login = (req: Request, res: Response) => {
+memberController.login = async (req: Request, res: Response) => {
     try {
         console.log("METHOD: login")
         const data: MemberLoginInput = req.body;
 
-        const result = null
-        res.send("hello world!")
+        const result = await memberService.login(data)
+
+        const payload: T = result,
+            token = await authService.createToken(payload)
+        res.cookie(
+            "accessToken",
+            token,
+            {
+                maxAge: 1000 * 3600 * TOKEN_DURATION,
+                httpOnly: false
+            }
+        )
+        res.status(HttpCode.OK).json(result)
     } catch (err: any) {
         console.log(`ERROR: login: ${err}`)
-        res.send("bye world!")
+        if (err instanceof Errors) res.status(err.code).json(err)
+        else res.status(Errors.standard.code).json(Errors.standard)
     }
 }
 

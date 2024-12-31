@@ -14,6 +14,8 @@ export enum Message {
     SOMETHING_WENT_WRONG = "Something went wrong!",
     CREATE_FAILED = "Create failed!",
     TOKEN_CREATE_FAILED = "Token creation failed!",
+    NO_DATA_FOUND = "There is no member with that nick!",
+    WRONG_PASSWORD = "You inserted wrong password!",
 
     PASSWORD_LENGTH = "Password should be at least 6 characters and no space"
 }
