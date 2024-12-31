@@ -2,19 +2,28 @@ import { T } from "../lib/types/common";
 import { Request, Response } from "express"
 import MemberService from "../model/Member.service";
 import { Errors } from "../lib/ErrorHander";
+import AuthService from "../model/Auth.service";
 
 const memberService = new MemberService()
+const authService = new AuthService();
+
 const memberController: T = {}
 
 memberController.signup = async (req: Request, res: Response) => {
     try {
         const data = req.body;
-        const result = await memberService.signup(data)
+        const result = await memberService.signup(data);
+
+        const payload: T = { ...result };
+        delete payload._id;
+        const token = await authService.createToken(payload);
+        res.cookie("accessToken", token)
+        
         res.status(201).json({ member: result })
     } catch (err: any) {
         console.log(`ERROR: createMember: ${err.message}`);
         if (err instanceof Errors) res.status(err.code).json(err)
-        else res.status(Errors.standard.code).json(Errors.standard)
+        else res.status(Errors.standard.code).json(err)
     }
 }
 

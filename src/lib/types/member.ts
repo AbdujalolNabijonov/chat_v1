@@ -11,5 +11,6 @@ export interface Member {
 
 export interface MemberInput {
     memberNick: string;
-    memberImage?: string
+    memberImage?: string;
+    memberPassword: string
 }

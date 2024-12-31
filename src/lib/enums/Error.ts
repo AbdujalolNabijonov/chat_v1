@@ -11,5 +11,9 @@ export enum HttpCode {
 
 export enum Message {
     USED_INFO = "You are inserting already used nick!",
-    SOMETHING_WENT_WRONG = "Something went wrong!"
+    SOMETHING_WENT_WRONG = "Something went wrong!",
+    CREATE_FAILED = "Create failed!",
+    TOKEN_CREATE_FAILED = "Token creation failed!",
+
+    PASSWORD_LENGTH = "Password should be at least 6 characters and no space"
 }

@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose"
+import { Message } from "../lib/enums/Error"
 
 
 export const memberSchema = new Schema({
@@ -10,6 +11,15 @@ export const memberSchema = new Schema({
     memberImage: {
         type: String,
         default: ""
+    },
+    memberPassword: {
+        type: String,
+        select: false,
+        required: true,
+        validate: {
+            validator: (data: string): boolean => data.length > 5 && !data.includes(" "),
+            message: Message.PASSWORD_LENGTH
+        },
     }
 }, { timestamps: true })
 
