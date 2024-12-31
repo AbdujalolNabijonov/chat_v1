@@ -1,14 +1,15 @@
 import { Schema, model } from "mongoose"
 
 
-const memberSchema = new Schema({
+export const memberSchema = new Schema({
     memberNick: {
         type: String,
-        require: true,
-        index: { unique: true, sparse: true }
+        index: { unique: true, sparse: true },
+        required: true,
     },
     memberImage: {
-        type: String
+        type: String,
+        default: ""
     }
 }, { timestamps: true })
 

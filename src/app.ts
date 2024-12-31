@@ -1,13 +1,20 @@
 import express from "express";
 import * as http from "http";
 import { Server } from "socket.io"
-import { CORS_LIST } from "./lib/config";
+import { CORS_LIST, MORGAN_FORMAT } from "./lib/config";
 import { InfoMessagePayload } from "./lib/types/socket";
-
+import morgan from "morgan"
+import memberController from "./controller/member.controller";
 const app = express();
-//ROUTER
 
-app.post("/auth",)
+
+app.use("/upload", express.static("upload"));
+app.use(morgan(MORGAN_FORMAT));
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
+
+//ROUTER
+app.post("/auth", memberController.createMember)
 
 
 

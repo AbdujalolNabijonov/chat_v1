@@ -1,13 +1,14 @@
 import { T } from "../lib/types/common";
 import { Request, Response } from "express"
-import Member from "../model/Member.service";
+import MemberService from "../model/Member.service";
 
-const memberService = new Member()
+const memberService = new MemberService()
 const memberController: T = {}
 
 memberController.createMember = async (req: Request, res: Response) => {
     try {
-        const result = memberService.createMember()
+        const data = req.body;
+        const result = await memberService.createMember(data)
         res.status(201).json({ member: result })
     } catch (err: any) {
         console.log(`ERROR: createMember: ${err.message}`);
