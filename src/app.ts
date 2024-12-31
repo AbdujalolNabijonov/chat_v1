@@ -1,10 +1,10 @@
 import express from "express";
 import * as http from "http";
 import { Server } from "socket.io"
+import router from "./router/router";
 import { CORS_LIST, MORGAN_FORMAT } from "./lib/config";
 import { InfoMessagePayload } from "./lib/types/socket";
 import morgan from "morgan"
-import memberController from "./controller/member.controller";
 const app = express();
 
 
@@ -14,10 +14,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 //ROUTER
-app.post("/auth", memberController.signup)
-
-
-
+app.use('/', router)
 
 //SOCKET
 const server = http.createServer(app);

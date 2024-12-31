@@ -11,6 +11,7 @@ const memberController: T = {}
 
 memberController.signup = async (req: Request, res: Response) => {
     try {
+        console.log("METHOD: signup")
         const data = req.body;
         const result = await memberService.signup(data);
 
@@ -18,7 +19,7 @@ memberController.signup = async (req: Request, res: Response) => {
         delete payload._id;
         const token = await authService.createToken(payload);
         res.cookie("accessToken", token)
-        
+
         res.status(201).json({ member: result })
     } catch (err: any) {
         console.log(`ERROR: createMember: ${err.message}`);
@@ -27,7 +28,15 @@ memberController.signup = async (req: Request, res: Response) => {
     }
 }
 
-
+memberController.login = (req: Request, res: Response) => {
+    try {
+        console.log("METHOD: login")
+        res.send("hello world!")
+    } catch (err: any) {
+        console.log(`ERROR: login: ${err}`)
+        res.send("bye world!")
+    }
+}
 
 
 export default memberController
