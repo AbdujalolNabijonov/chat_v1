@@ -3,6 +3,7 @@ import { Errors } from "../lib/ErrorHander";
 import { HttpCode, Message } from "../lib/enums/Error";
 import MemberModel from "../schema/Member.schema"
 import { MemberInput, Member } from "src/lib/types/member";
+import * as argon from "argon2"
 
 
 
@@ -18,6 +19,7 @@ export default class MemberService {
             const { memberNick, memberPassword } = data;
             if (memberNick.length < 2 || memberPassword.length < 3) throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
 
+            data.memberPassword = await argon.hash(memberPassword);
             try {
                 const member = await this.memberModel.create(data)
                 return member
