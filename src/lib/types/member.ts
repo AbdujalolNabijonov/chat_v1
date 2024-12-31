@@ -9,8 +9,12 @@ export interface Member {
 }
 
 
-export interface MemberInput {
+export interface MemberSignupInput {
     memberNick: string;
     memberImage?: string;
     memberPassword: string
+}
+
+export interface MemberLoginInput{
+
 }
