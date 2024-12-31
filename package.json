@@ -2,18 +2,20 @@
   "name": "community-chat-socketio",
   "version": "1.0.0",
   "description": "This is Community chatting web App for real time chatting",
-  "main": "./src/server.ts",
-  "type": "module",
+  "main": "src/server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node ./src/server.ts",
-    "dev": ""
+    "start": "ts-node src/server.ts",
+    "dev": "nodemon --exec ts-node src/server.ts"
   },
   "author": "Abdujalol",
   "license": "ISC",
   "dependencies": {
+    "@types/mongoose": "^5.11.96",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "mongoose": "^8.9.2",
+    "nodemon": "^3.1.9",
     "socket.io": "^4.8.1",
     "ts-node": "^10.9.2",
     "tsconfig": "^7.0.0",
