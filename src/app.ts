@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 //ROUTER
-app.post("/auth", memberController.createMember)
+app.post("/auth", memberController.signup)
 
 
 
