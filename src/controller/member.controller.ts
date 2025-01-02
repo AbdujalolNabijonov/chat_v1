@@ -15,7 +15,8 @@ const memberController: T = {}
 memberController.signup = async (req: Request, res: Response) => {
     try {
         console.log("METHOD: signup")
-        const data: MemberSignupInput = req.body;
+        const data = req.body;
+        data.memberImage = req.file?.path.replace(/\\/g,"/")
         const result = await memberService.signup(data);
 
         const payload: T = { ...result };
@@ -60,6 +61,17 @@ memberController.login = async (req: Request, res: Response) => {
         console.log(`ERROR: login: ${err}`)
         if (err instanceof Errors) res.status(err.code).json(err)
         else res.status(Errors.standard.code).json(Errors.standard)
+    }
+}
+
+memberController.logout = async (req: Request, res: Response) => {
+    try {
+        console.log("METHOD: logout");
+        res.cookie("accessToken", null, { maxAge: 0, httpOnly: false });
+        res.status(HttpCode.OK).json("sucess")
+    } catch (err: any) {
+        console.log(`Error: logout, ${err.message}`);
+        res.status(HttpCode.INTERNAL_SERVER_ERROR).json(Errors.standard)
     }
 }
 
