@@ -46,8 +46,7 @@ memberController.login = async (req: Request, res: Response) => {
 
         const result = await memberService.login(data)
 
-        const payload: T = result,
-            token = await authService.createToken(payload)
+        const token = await authService.createToken(result) as string
         res.cookie(
             "accessToken",
             token,

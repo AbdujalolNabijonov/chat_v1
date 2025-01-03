@@ -30,6 +30,14 @@ class AuthService {
         }
     }
 
+    public async verifyMember(token: string) {
+        try {
+            return await jwt.verify(token, SECRET_JWT)
+        } catch (err: any) {
+            console.log(`JWT ERROR: verifyMember, ${err.message}`)
+            throw err
+        }
+    }
 
 }
 

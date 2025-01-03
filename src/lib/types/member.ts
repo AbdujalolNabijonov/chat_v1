@@ -5,6 +5,7 @@ export interface Member {
     memberNick: string
     memberPhone: string
     memberImage: string
+    accessToken:string
     updatedAt: Date
     createdAt: Date
 }
