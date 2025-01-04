@@ -62,9 +62,9 @@ memberController.login = async (req: Request, res: Response) => {
 
 memberController.logout = async (req: Request, res: Response) => {
     try {
-        console.log("METHOD: logout");
-        res.cookie("accessToken", null, { maxAge: 0, httpOnly: false });
-        res.status(HttpCode.OK).json("sucess")
+        console.log("METHOD: logout");  
+        res.cookie("accessToken", null, { maxAge: 0, httpOnly: false});
+        res.status(HttpCode.OK).json("success")
     } catch (err: any) {
         console.log(`Error: logout, ${err.message}`);
         res.status(HttpCode.INTERNAL_SERVER_ERROR).json(Errors.standard)

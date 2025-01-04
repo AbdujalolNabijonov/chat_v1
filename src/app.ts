@@ -8,7 +8,6 @@ import morgan from "morgan"
 import { T } from "./lib/types/common";
 import cors from "cors"
 import AuthService from "./model/Auth.service";
-import { Message } from "./lib/enums/Error";
 import { Member } from "./lib/types/member";
 
 const app = express();
