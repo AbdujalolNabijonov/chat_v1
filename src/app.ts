@@ -28,6 +28,7 @@ const server = http.createServer(app);
 const socketClients = new Map()
 const clientMessages: T = {}
 let totalClientsList: T = {}
+let socketRoom: string;
 
 
 const io = new Server(
@@ -39,39 +40,40 @@ io.on("connection", async (client) => {
     console.log("=== Socket Connection ===")
 
     const authService = new AuthService()
-    let socketRoom: string;
     client.on("joinRoom", async (roomName) => {
+
         socketRoom = JSON.parse(roomName)
         client.join(socketRoom)
+
         if (!totalClientsList[socketRoom]) totalClientsList[socketRoom] = 1;
         else totalClientsList[socketRoom]++
+
+        console.log(`=== RoomName: ${JSON.parse(roomName)} ===`)
 
         if (client.request?.headers?.authorization) {
             const token = client.request.headers.authorization.split(" ")[1];
             const member = await authService.verifyMember(token) as Member
-            const payload = { memberData: member, socketRoom }
-            if (socketClients.get(client)?.memberData?._id !== member._id) socketClients.set(client, payload);
-        }
 
-        console.log(`=== RoomName: ${JSON.parse(roomName)} ===`)
+            const payload = { ...member, socketRoom }
+            socketClients.set(client, payload);
+        }
 
         const infoPayloadConnection: InfoMessagePayload = {
             event: "info",
             totalClients: totalClientsList[socketRoom],
             memberData: socketClients.get(client),
+            timer: new Date(),
             action: "joined"
         }
-
-        if (!clientMessages[socketRoom]) clientMessages[socketRoom] = [];
-        clientMessages[socketRoom].push(infoPayloadConnection)
-        const relatedMembers = Array.from(socketClients.values()).filter((ele) => ele.socketRoom === socketRoom)
         io.to(socketRoom).emit("info", JSON.stringify(infoPayloadConnection))
+
+        const relatedMembers = Array.from(socketClients.values()).filter((ele) => ele.socketRoom === socketRoom)
         io.to(socketRoom).emit("getMembers", JSON.stringify(relatedMembers))
         const getMessagesPayload: GetMessagesPayload = {
             event: "getMessages",
-            list: clientMessages[socketRoom]
+            list: clientMessages[socketRoom]??[]
         }
-        client.emit("getMessages", JSON.stringify(getMessagesPayload))
+        io.to(socketRoom).emit("getMessages", JSON.stringify(getMessagesPayload))
     })
 
     client.on("message", (data) => {
@@ -82,11 +84,16 @@ io.on("connection", async (client) => {
             event: "message",
             text: message.text,
             memberData: socketClients.get(client),
+            timer: new Date(),
             action: "joined"
         }
 
         clientMessages[socketRoom].push(messagePayload)
-        io.to(socketRoom).emit("message", JSON.stringify(messagePayload))
+        const getMessagesPayload: GetMessagesPayload = {
+            event: "getMessages",
+            list: clientMessages[socketRoom]
+        }
+        io.to(socketRoom).emit("getMessages", JSON.stringify(getMessagesPayload))
     })
 
 
@@ -96,16 +103,16 @@ io.on("connection", async (client) => {
             event: "info",
             totalClients: totalClientsList[socketRoom],
             memberData: socketClients.get(client),
+            timer: new Date(),
             action: "left"
         }
-        clientMessages[socketRoom].push(infoPayloadDisconnect)
         console.log("=== Socket Disconnected ===")
         socketClients.delete(client)
-        const getMessagesPayload:GetMessagesPayload={
-            event:'getMessages',
-            list:clientMessages[socketRoom]
-        }
-        io.to(socketRoom).emit("getMessages", JSON.stringify(getMessagesPayload))
+
+        io.to(socketRoom).emit("info", JSON.stringify(infoPayloadDisconnect))
+
+        const relatedMembers = Array.from(socketClients.values()).filter((ele) => ele.socketRoom === socketRoom)
+        io.to(socketRoom).emit("getMembers", JSON.stringify(relatedMembers))
     })
 })
 

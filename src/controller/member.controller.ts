@@ -18,10 +18,7 @@ memberController.signup = async (req: Request, res: Response) => {
         const data = req.body;
         data.memberImage = req.file?.path.replace(/\\/g,"/")
         const result = await memberService.signup(data);
-
-        const payload: T = { ...result };
-        delete payload._id;
-        const token = await authService.createToken(payload);
+        const token = await authService.createToken(result);
         res.cookie(
             "accessToken",
             token,

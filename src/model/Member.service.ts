@@ -22,7 +22,7 @@ export default class MemberService {
             data.memberPassword = await argon.hash(memberPassword);
             try {
                 const member = await this.memberModel.create(data)
-                return member
+                return member.toObject()
             } catch (err: any) {
                 console.log(`DB ERROR: ${err.message}`)
                 throw new Errors(HttpCode.BAD_REQUEST, Message.USED_INFO);
@@ -43,9 +43,8 @@ export default class MemberService {
             if (!exist) throw new Errors(HttpCode.INTERNAL_SERVER_ERROR, Message.NO_DATA_FOUND);
 
             const isMatch = await argon.verify(exist.memberPassword, memberPassword);
-            delete exist.memberPassword
             if (!isMatch) throw new Errors(HttpCode.BAD_REQUEST, Message.WRONG_PASSWORD)
-            return exist
+            return await this.memberModel.findOne({memberNick}).lean()
         } catch (err: any) {
             throw err
         }

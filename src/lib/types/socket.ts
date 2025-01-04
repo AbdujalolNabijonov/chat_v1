@@ -5,6 +5,7 @@ export interface InfoMessagePayload {
     totalClients: number;
     memberData: any;
     action: string;
+    timer:Date
 }
 
 export interface MessagePayload{
@@ -12,6 +13,7 @@ export interface MessagePayload{
     text:string,
     memberData:Member;
     action:string;
+    timer:Date
 }
 
 export interface GetMessagesPayload{

@@ -35,7 +35,6 @@ class AuthService {
             return await jwt.verify(token, SECRET_JWT)
         } catch (err: any) {
             console.log(`JWT ERROR: verifyMember, ${err.message}`)
-            throw err
         }
     }
 
