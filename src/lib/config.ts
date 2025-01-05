@@ -1,5 +1,7 @@
 import dotenv from "dotenv"
-dotenv.config()
+dotenv.config({
+    path:process.env.NODE_ENV==="production"?".env.production":".env.development"
+})
 
 //export const CORS_LIST = ["DOMAIN"]
 export const CORS_LIST = true //open for all requested clients;

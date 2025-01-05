@@ -9,6 +9,7 @@ import { T } from "./lib/types/common";
 import cors from "cors"
 import AuthService from "./model/Auth.service";
 import { Member } from "./lib/types/member";
+import { Message } from "./lib/enums/Error";
 
 const app = express();
 
@@ -40,40 +41,43 @@ io.on("connection", async (client) => {
 
     const authService = new AuthService()
     client.on("joinRoom", async (roomName) => {
+        try {
+            socketRoom = JSON.parse(roomName)
+            client.join(socketRoom)
 
-        socketRoom = JSON.parse(roomName)
-        client.join(socketRoom)
+            if (!totalClientsList[socketRoom]) totalClientsList[socketRoom] = 1;
+            else totalClientsList[socketRoom]++
 
-        if (!totalClientsList[socketRoom]) totalClientsList[socketRoom] = 1;
-        else totalClientsList[socketRoom]++
+            console.log(`=== RoomName: ${JSON.parse(roomName)} ===`)
 
-        console.log(`=== RoomName: ${JSON.parse(roomName)} ===`)
+            if (!client.request.headers.authorization) throw new Error(Message.TOKEN_NOT_PROVIDED)
 
-        if (client.request?.headers?.authorization) {
             const token = client.request.headers.authorization.split(" ")[1];
             const member = await authService.verifyMember(token) as Member
-
             const payload = { ...member, socketRoom }
             socketClients.set(client, payload);
-        }
+            const infoPayloadConnection: InfoMessagePayload = {
+                event: "info",
+                totalClients: totalClientsList[socketRoom],
+                memberData: socketClients.get(client),
+                timer: new Date(),
+                action: "joined"
+            }
+            io.to(socketRoom).emit("info", JSON.stringify(infoPayloadConnection))
 
-        const infoPayloadConnection: InfoMessagePayload = {
-            event: "info",
-            totalClients: totalClientsList[socketRoom],
-            memberData: socketClients.get(client),
-            timer: new Date(),
-            action: "joined"
+            const relatedMembers = Array.from(socketClients.values()).filter((ele) => ele.socketRoom === socketRoom)
+            io.to(socketRoom).emit("getMembers", JSON.stringify(relatedMembers))
+            const getMessagesPayload: GetMessagesPayload = {
+                event: "getMessages",
+                list: clientMessages[socketRoom] ?? []
+            }
+            io.to(socketRoom).emit("getMessages", JSON.stringify(getMessagesPayload))
+        } catch (err: any) {
+            console.log(`ERROR TOKEN: ${err.message}`);
+            io.emit("error", JSON.stringify(err.message))
         }
-        io.to(socketRoom).emit("info", JSON.stringify(infoPayloadConnection))
-
-        const relatedMembers = Array.from(socketClients.values()).filter((ele) => ele.socketRoom === socketRoom)
-        io.to(socketRoom).emit("getMembers", JSON.stringify(relatedMembers))
-        const getMessagesPayload: GetMessagesPayload = {
-            event: "getMessages",
-            list: clientMessages[socketRoom]??[]
-        }
-        io.to(socketRoom).emit("getMessages", JSON.stringify(getMessagesPayload))
-    })
+    }
+    )
 
     client.on("message", (data) => {
         const message = JSON.parse(data);
