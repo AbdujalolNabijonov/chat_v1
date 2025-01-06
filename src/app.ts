@@ -42,6 +42,11 @@ io.on("connection", async (client) => {
     const authService = new AuthService()
     client.on("joinRoom", async (roomName) => {
         try {
+            if (!client.request.headers.authorization) throw new Error(Message.TOKEN_NOT_PROVIDED)
+            const token = client.request.headers.authorization.split(" ")[1];
+            const member = await authService.verifyMember(token) as Member
+
+            if (Array.from(socketClients.values()).some((ele: any) => ele._id === member._id)) throw new Error(Message.BEING_USED_ONE)
             socketRoom = JSON.parse(roomName)
             client.join(socketRoom)
 
@@ -50,10 +55,6 @@ io.on("connection", async (client) => {
 
             console.log(`=== RoomName: ${JSON.parse(roomName)} ===`)
 
-            if (!client.request.headers.authorization) throw new Error(Message.TOKEN_NOT_PROVIDED)
-
-            const token = client.request.headers.authorization.split(" ")[1];
-            const member = await authService.verifyMember(token) as Member
             const payload = { ...member, socketRoom }
             socketClients.set(client, payload);
             const infoPayloadConnection: InfoMessagePayload = {
@@ -74,7 +75,7 @@ io.on("connection", async (client) => {
             io.to(socketRoom).emit("getMessages", JSON.stringify(getMessagesPayload))
         } catch (err: any) {
             console.log(`ERROR TOKEN: ${err.message}`);
-            io.emit("error", JSON.stringify(err.message))
+            client.emit("error", JSON.stringify(err.message))
         }
     }
     )
@@ -116,6 +117,11 @@ io.on("connection", async (client) => {
 
         const relatedMembers = Array.from(socketClients.values()).filter((ele) => ele.socketRoom === socketRoom)
         io.to(socketRoom).emit("getMembers", JSON.stringify(relatedMembers))
+        const getMessagesPayload: GetMessagesPayload = {
+            event: "getMessages",
+            list: clientMessages[socketRoom]
+        }
+        io.to(socketRoom).emit("getMessages", JSON.stringify(getMessagesPayload))
     })
 })
 
